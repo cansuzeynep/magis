@@ -1,0 +1,14 @@
+# Local config with secrets - DO NOT COMMIT
+config.py
+
+# State file (managed by GitHub Actions artifacts)
+seen_listings.json
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+
+# IDE
+.vscode/
+.idea/

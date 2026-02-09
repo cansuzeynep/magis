@@ -1,0 +1,46 @@
+name: Rental Monitor
+
+on:
+  schedule:
+    # Runs every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  check-rentals:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      
+      - name: Download seen listings cache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Try to download the artifact from the last run
+          gh run download --name seen-listings --dir . || echo "No previous cache found"
+      
+      - name: Run rental monitor
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python rental_monitor.py
+      
+      - name: Upload seen listings cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: seen-listings
+          path: seen_listings.json
+          retention-days: 90
+          overwrite: true
