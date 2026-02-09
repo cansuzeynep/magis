@@ -1,4 +1,4 @@
-# Magis Rental Monitor
+# Magis Rental Monitor (v1.0.1)
 
 Monitors [magisrealestate.com/for-rent](https://magisrealestate.com/for-rent) for Eindhoven rentals and sends email notifications. Priority alerts for Boschdijk listings!
 
