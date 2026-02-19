@@ -28,13 +28,13 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
       
-      - name: Download seen listings cache
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Try to download the artifact from the last run
-          gh run download --name seen-listings --dir . || echo "No previous cache found"
+      - name: Cache seen listings
+        uses: actions/cache@v4
+        with:
+          path: seen_listings.json
+          key: seen-listings-${{ github.run_id }}
+          restore-keys: |
+            seen-listings-
       
       - name: Run rental monitor
         env:
@@ -44,10 +44,4 @@ jobs:
           CLEAR_CACHE: ${{ github.event.inputs.clear_cache }}
         run: python rental_monitor.py
       
-      - name: Upload seen listings cache
-        uses: actions/upload-artifact@v4
-        with:
-          name: seen-listings
-          path: seen_listings.json
-          retention-days: 90
-          overwrite: true
+      # The cache is automatically updated by actions/cache at the end of the run if it successfully completes.
