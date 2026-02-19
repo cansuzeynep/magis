@@ -5,6 +5,12 @@ on:
     # Runs every 5 minutes
     - cron: '*/5 * * * *'
   workflow_dispatch:  # Allows manual trigger from GitHub UI
+    inputs:
+      clear_cache:
+        description: 'Clear the seen listings cache'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   check-rentals:
@@ -35,6 +41,7 @@ jobs:
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          CLEAR_CACHE: ${{ github.event.inputs.clear_cache }}
         run: python rental_monitor.py
       
       - name: Upload seen listings cache

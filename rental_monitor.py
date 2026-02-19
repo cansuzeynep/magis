@@ -42,6 +42,10 @@ GITHUB_ACTIONS = os.environ.get("GITHUB_ACTIONS") == "true"
 
 def load_seen_listings():
     """Load previously seen listings from state file."""
+    if os.environ.get("CLEAR_CACHE") == "true":
+        print(f"[{datetime.now()}] Cache clear requested via environment variable.")
+        return set()
+        
     if STATE_FILE.exists():
         with open(STATE_FILE, "r", encoding="utf-8") as f:
             return set(json.load(f))
