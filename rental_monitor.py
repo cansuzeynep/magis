@@ -36,7 +36,7 @@ if not SENDER_EMAIL:
 # Constants
 URL = "https://magisrealestate.com/for-rent"
 STATE_FILE = Path(__file__).parent / "seen_listings.json"
-CHECK_INTERVAL = 300  # 5 minutes in seconds
+CHECK_INTERVAL = 120  # 2 minutes in seconds
 GITHUB_ACTIONS = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
