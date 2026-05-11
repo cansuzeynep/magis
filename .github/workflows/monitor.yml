@@ -3,22 +3,14 @@ name: Rental Monitor
 on:
   schedule:
     # Runs every 5 minutes
-    # The script inside runs 3 times (at 0m, 2m, and 4m) then exits
     - cron: '*/5 * * * *'
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
     inputs:
       clear_cache:
         description: 'Clear the seen listings cache'
         required: false
         type: boolean
         default: false
-
-# Ensures only one monitor runs at a time. 
-# Since our script now exits after 4 minutes, this should naturally 
-# turn GREEN before the next one starts.
-concurrency:
-  group: rental-monitor
-  cancel-in-progress: true
 
 jobs:
   check-rentals:

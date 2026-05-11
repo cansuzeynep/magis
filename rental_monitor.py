@@ -257,38 +257,34 @@ def check_for_new_listings():
 
 
 def main():
-    """Main entry point - runs in a loop to monitor listings."""
+    """Main entry point - runs once on GitHub Actions, loops locally."""
     print("=" * 50)
     print("[MONITOR] Magis Real Estate Rental Monitor")
     print("=" * 50)
     print(f"Monitoring: {URL}")
     print(f"Filter: Eindhoven (priority: Boschdijk)")
     print(f"Notifications: {RECIPIENT_EMAIL}")
-    print(f"Interval: {CHECK_INTERVAL // 60} minutes")
     print(f"Mode: {'GitHub Actions' if GITHUB_ACTIONS else 'Local'}")
     print("=" * 50)
     print()
     
-    # On GitHub Actions, we run a set number of times and exit to get a 'Green' status
-    # 3 runs with 2-minute gaps = ~4 minutes total (fits in 5-min cron window)
-    max_runs = 3 if GITHUB_ACTIONS else float('inf')
-    run_count = 0
-    
-    while run_count < max_runs:
-        run_count += 1
+    if GITHUB_ACTIONS:
+        # On GitHub Actions: run once and exit (Actions handles scheduling)
         try:
-            if GITHUB_ACTIONS:
-                print(f"[{datetime.now()}] Run {run_count} of {max_runs}")
             check_for_new_listings()
         except Exception as e:
             print(f"[{datetime.now()}] Error: {e}")
-        
-        if run_count < max_runs:
+            exit(1)
+    else:
+        # Locally: run in a loop
+        while True:
+            try:
+                check_for_new_listings()
+            except Exception as e:
+                print(f"[{datetime.now()}] Error: {e}")
+            
             print(f"[{datetime.now()}] Next check in {CHECK_INTERVAL // 60} minutes...")
             time.sleep(CHECK_INTERVAL)
-    
-    if GITHUB_ACTIONS:
-        print(f"[{datetime.now()}] Finished scheduled runs. Exiting to complete job.")
 
 
 if __name__ == "__main__":
