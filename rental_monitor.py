@@ -257,34 +257,29 @@ def check_for_new_listings():
 
 
 def main():
-    """Main entry point - runs once on GitHub Actions, loops locally."""
+    """Main entry point - runs in a loop to monitor listings."""
     print("=" * 50)
     print("[MONITOR] Magis Real Estate Rental Monitor")
     print("=" * 50)
     print(f"Monitoring: {URL}")
     print(f"Filter: Eindhoven (priority: Boschdijk)")
     print(f"Notifications: {RECIPIENT_EMAIL}")
+    print(f"Interval: {CHECK_INTERVAL // 60} minutes")
     print(f"Mode: {'GitHub Actions' if GITHUB_ACTIONS else 'Local'}")
     print("=" * 50)
     print()
     
-    if GITHUB_ACTIONS:
-        # On GitHub Actions: run once and exit (Actions handles scheduling)
+    # Run in a loop
+    while True:
         try:
             check_for_new_listings()
         except Exception as e:
             print(f"[{datetime.now()}] Error: {e}")
-            exit(1)
-    else:
-        # Locally: run in a loop
-        while True:
-            try:
-                check_for_new_listings()
-            except Exception as e:
-                print(f"[{datetime.now()}] Error: {e}")
-            
-            print(f"[{datetime.now()}] Next check in {CHECK_INTERVAL // 60} minutes...")
-            time.sleep(CHECK_INTERVAL)
+        
+        # On GitHub Actions, we still loop, but the workflow concurrency 
+        # will periodically restart us to ensure we don't timeout.
+        print(f"[{datetime.now()}] Next check in {CHECK_INTERVAL // 60} minutes...")
+        time.sleep(CHECK_INTERVAL)
 
 
 if __name__ == "__main__":
