@@ -269,17 +269,26 @@ def main():
     print("=" * 50)
     print()
     
-    # Run in a loop
-    while True:
+    # On GitHub Actions, we run a set number of times and exit to get a 'Green' status
+    # 3 runs with 2-minute gaps = ~4 minutes total (fits in 5-min cron window)
+    max_runs = 3 if GITHUB_ACTIONS else float('inf')
+    run_count = 0
+    
+    while run_count < max_runs:
+        run_count += 1
         try:
+            if GITHUB_ACTIONS:
+                print(f"[{datetime.now()}] Run {run_count} of {max_runs}")
             check_for_new_listings()
         except Exception as e:
             print(f"[{datetime.now()}] Error: {e}")
         
-        # On GitHub Actions, we still loop, but the workflow concurrency 
-        # will periodically restart us to ensure we don't timeout.
-        print(f"[{datetime.now()}] Next check in {CHECK_INTERVAL // 60} minutes...")
-        time.sleep(CHECK_INTERVAL)
+        if run_count < max_runs:
+            print(f"[{datetime.now()}] Next check in {CHECK_INTERVAL // 60} minutes...")
+            time.sleep(CHECK_INTERVAL)
+    
+    if GITHUB_ACTIONS:
+        print(f"[{datetime.now()}] Finished scheduled runs. Exiting to complete job.")
 
 
 if __name__ == "__main__":
